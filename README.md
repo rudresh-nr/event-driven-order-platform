@@ -1,46 +1,65 @@
-## event-driven-order-platform
-An event-driven order platform showcasing strong write consistency, asynchronous processing, and derived read models with explicit failure handling.
+# Full-Stack AI-Enabled Platform
+Django · React · REST · PostgreSQL · Docker
 
-## System Guarantees
+## Overview
 
-1. Strong Consistency for Writes
-   All order creation and state transitions are atomic and strongly consistent.
-   - Each order is written using a single database transaction
-   - Either the entire write succeeds, or nothing is persisted
-   - No partial order states are visible to clients
+This project is a production-grade full-stack web application built using Django (Backend) and React (Frontend).
+It demonstrates clean architecture, scalable backend design, secure APIs, and modern frontend practices, with optional GenAI integration for intelligent features.
 
-2. Event Emission Is Transactionally Safe
-   - Events are persisted in the same transaction as domain state
-   - No event is published without a corresponding committed state
-   - Dual-write inconsistencies are explicitly avoided
+### Key Objectives
+- Design a scalable backend architecture using Django
+- Implement secure, versioned REST APIs
+- Build a clean and maintainable React frontend
+- Demonstrate real-world system design decisions
+- Showcase production concerns: auth, performance, testing, deployment
+### Tech Stack
+#### Backend
 
-3. Read Models Are Eventually Consistent
-   All query-facing views are derived asynchronously from events.
-   - Read models may temporarily lag behind the write model
-   - The system favors availability and low read latency for queries
-   - Eventual consistency is explicit and documented
+- Django
+- Django REST Framework
+- PostgreSQL
+- JWT Authentication
+- Celery (async tasks)
+- Redis (caching / queues)
 
-4. Consumers Are Idempotent and Replayable
-   Event consumers are designed to be idempotent and replay-safe.
-   - Duplicate events do not corrupt derived state
-   - Read models can be fully rebuilt by replaying the event log
-   - Offset management favors at-least-once delivery
+#### Frontend
+- React
+- TypeScript
+- Axios
+- React Query
+- Tailwind CSS
 
-5. Writes Are Not Blocked by Downstream Failures
-   Failures in event publishing, consumers, or read models never block order creation.
-   - Orders can be created even if the event system is unavailable
-   - Backlogs are drained when downstream systems recover
-   - The system degrades gracefully under partial failure
+#### Infrastructure
+- Docker & Docker Compose
+- Nginx
+- GitHub Actions (CI/CD)
 
-## Explicit Non-Goals and Trade-Offs
-1. No Global Strong Consistency
-   Non-goal
-   - The system does not provide strong consistency across all read paths.
-     
-   Trade-off
-   - Read models may return stale data briefly.
+<img width="442" height="238" alt="Screenshot from 2026-01-14 15-06-41" src="https://github.com/user-attachments/assets/714eca67-e9a6-4cec-b067-023d37583c59" />
 
-   Why this is intentional
-   - Enforcing global consistency would reduce availability and increase latency. The system explicitly optimizes for correctness on writes and scalability on reads.
-   
-  
+#### Backend Architecture Principles
+- Separation of Concerns
+- Thin Views, Fat Services
+- Domain-driven structure (not “fat models”)
+- Explicit business logic layer
+- Framework treated as infrastructure, not core logic
+
+## Features
+
+### Core Features
+- User authentication & authorization (JWT)
+- Role-based access control
+- CRUD APIs with pagination & filtering
+- Secure API versioning (/api/v1/)
+- Centralized error handling
+
+### Advanced Features
+- Async background jobs using Celery
+- Caching for high-read endpoints
+- Rate limiting & security headers
+- Optimized database queries
+- Modular, testable frontend components
+
+### GenAI Integration
+- AI-powered search or recommendations
+- Prompt orchestration via service layer
+- Model-agnostic AI provider abstraction
