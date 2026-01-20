@@ -63,3 +63,13 @@ It demonstrates clean architecture, scalable backend design, secure APIs, and mo
 - AI-powered search or recommendations
 - Prompt orchestration via service layer
 - Model-agnostic AI provider abstraction
+
+
+
+============#########===========================##################==================#################===
+
+
+
+
+## Eventual Consistency
+"Orders appear immediately after creation, but user-facing order history may lag briefly while events are processed asynchronously. This trade-off allows the system to remain available under failure and scale read workloads independently."
