@@ -11,7 +11,7 @@ def create_order(user_id, total_amount):
         total_amount=total_amount,
     )
 
-    raise Exception("Simulated failure after order creation")
+    #raise Exception("Simulated failure after order creation")
 
     OutboxEvent.objects.create(
         aggregate_type="Order",
