@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from readmodels.api import OrdersByUserView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('users/<uuid:user_id>/orders/', OrdersByUserView.as_view()),
 ]

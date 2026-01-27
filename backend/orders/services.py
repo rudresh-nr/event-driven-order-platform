@@ -17,11 +17,13 @@ def create_order(user_id, total_amount):
         aggregate_type="Order",
         aggregate_id=order.id,
         event_type="OrderCreated",
-        schema_version=1,
+        schema_version=2,
         payload={
             "order_id": str(order.id),
             "user_id": str(user_id),
             "total_amount": str(total_amount),
+            "currency": "INR",
+            "source": "web",
         },
     )
 
