@@ -76,3 +76,41 @@ It demonstrates clean architecture, scalable backend design, secure APIs, and mo
 
 ## Handling cache failures
 The read path tolerates cache failures by falling back to database-backed projections. Redis is treated as a best-effort performance optimization rather than a required dependency.
+
+## Failure & Recovery
+This system is explicitly designed to tolerate partial failures and recover
+without data loss or manual intervention.
+
+### Publisher Failure (Async Infrastructure Down)
+If the event publisher or message broker is unavailable:
+- Orders continue to be created synchronously
+- Outbox events are persisted with `published = false`
+- A backlog accumulates safely in the database
+
+Once the publisher is restored, pending events are published in order.
+No committed order state is lost.
+
+### Consumer Failure or Restart
+If consumers crash or are restarted:
+- Events may be delivered more than once
+- Consumers are idempotent and replay-safe
+- Duplicate processing does not create duplicate state
+
+
+Consumers can be safely restarted without coordination.
+
+### Read Model Corruption or Data Loss
+Read models are treated as disposable projections:
+- Tables can be truncated or dropped
+- State is rebuilt by replaying published events
+- Reprocessing events is deterministic and safe
+
+
+
+The authoritative state is never derived from read models.
+
+### Cache Failure
+Redis is used as a best-effort cache:
+- Cache outages degrade performance only
+- Read requests fall back to database-backed projections
+- No correctness or availability guarantees depend on Redis
