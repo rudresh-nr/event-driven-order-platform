@@ -50,8 +50,7 @@ def consume_published_events(self, batch_size=100):
     for event in events:
         dispatch_event({
             "event_type": event.event_type,
-            "order_id": event.payload["order_id"],
-            "user_id": event.payload["user_id"],
-            "total_amount": event.payload["total_amount"],
+            "payload": event.payload,
+            "schema_version": event.schema_version,
             "created_at": event.created_at,
         })
