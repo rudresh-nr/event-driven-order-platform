@@ -1,10 +1,20 @@
+from asyncio.log import logger
 from .models import OrdersByUser
 
 def handle_order_created(event):
 
+    logger.info(
+        "Processing event", extra={
+            "event_id" : event["id"],
+            "schema_version" : event["schema_version"],
+            "created_at" : event["created_at"], # optional but useful
+        }
+    )
+
+
     version = event.get("schema_version", 1)
     payload = event["payload"]
-
+ 
     print(
     "CONSUMING:",
     "version=", version,
