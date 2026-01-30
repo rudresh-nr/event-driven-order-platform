@@ -5,7 +5,7 @@ def handle_order_created(event):
 
     logger.info(
         "Processing event", extra={
-            "event_id" : event["id"],
+            "order_id" : event["payload"].get("order_id"),
             "schema_version" : event["schema_version"],
             "created_at" : event["created_at"], # optional but useful
         }
@@ -47,4 +47,13 @@ def handle_order_created(event):
             "currency": currency,
             "created_at": event["created_at"],
         }
+    )
+
+def handle_order_cancelled(event):
+    payload = event["payload"]
+
+    OrdersByUser.objects.filter(
+        order_id = payload["order_id"]
+    ).update(
+        status = "CANCELLED"
     )

@@ -28,3 +28,24 @@ def create_order(user_id, total_amount):
     )
 
     return order
+
+@transaction.atomic
+def cancel_order(order_id):
+    order = Order.objects.select_for_update().get(id=order_id)
+
+    if order.status != Order.STATUS_CREATED:
+        raise ValueError("Only orders in CREATED status can be cancelled.")
+    order.status = Order.STATUS_CANCELLED
+    order.save()
+    OutboxEvent.objects.create(aggregate_id = order.id,
+                                aggregate_type="Order",
+                                event_type="OrderCancelled",
+                                schema_version=1,
+                                payload = {
+                                    "order_id": str(order.id),
+                                    "user_id": str(order.user_id),
+                                    "total_amount": str(order.total_amount),
+                                },
+                                
+                                )
+    
