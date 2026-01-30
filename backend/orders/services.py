@@ -30,22 +30,22 @@ def create_order(user_id, total_amount):
     return order
 
 @transaction.atomic
-def cancel_order(order_id):
+def cancel_order(order_id: str, reason: str="User requested cancellation"):
     order = Order.objects.select_for_update().get(id=order_id)
 
-    if order.status != Order.STATUS_CREATED:
-        raise ValueError("Only orders in CREATED status can be cancelled.")
-    order.status = Order.STATUS_CANCELLED
-    order.save()
-    OutboxEvent.objects.create(aggregate_id = order.id,
-                                aggregate_type="Order",
-                                event_type="OrderCancelled",
-                                schema_version=1,
-                                payload = {
-                                    "order_id": str(order.id),
-                                    "user_id": str(order.user_id),
-                                    "total_amount": str(order.total_amount),
-                                },
-                                
-                                )
+    if not order.can_transition_to("CANCELLED"):
+        raise ValueError(f" Order {order.id} cannot be cancelled from status {order.status}.")
     
+    order.status = "CANCELLED"
+    order.save(update_fields=["status"])
+
+    OutboxEvent.objects.create(
+        aggregate_type = "Order",
+        aggregate_id = order.id,
+        event_type = "OrderCancelled",
+        schema_version = 1,
+        payload = {
+            "order_id": str(order.id),
+            "reason": reason,
+        }
+    )

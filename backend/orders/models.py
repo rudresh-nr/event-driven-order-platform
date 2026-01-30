@@ -33,3 +33,12 @@ class Order(models.Model):
                 name="valid_order_status",
             )
         ]
+
+
+    ALLOWED_TRANSITIONS = {
+        "CREATED": {"CANCELLED"},
+        "CANCELLED": set(),
+
+    }
+    def can_transition_to(self, new_status: str) -> bool:
+        return new_status in self.ALLOWED_TRANSITIONS.get(self.status, set())
