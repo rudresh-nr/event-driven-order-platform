@@ -29,23 +29,26 @@ def create_order(user_id, total_amount):
 
     return order
 
-@transaction.atomic
+
 def cancel_order(order_id: str, reason: str="User requested cancellation"):
-    order = Order.objects.select_for_update().get(id=order_id)
+    with transaction.atomic():
+        order = Order.objects.select_for_update().get(id=order_id)
 
-    if not order.can_transition_to("CANCELLED"):
-        raise ValueError(f" Order {order.id} cannot be cancelled from status {order.status}.")
-    
-    order.status = "CANCELLED"
-    order.save(update_fields=["status"])
+        if not order.can_transition_to("CANCELLED"):
+            raise ValueError(f" Order {order.id} cannot be cancelled from status {order.status}.")
 
-    OutboxEvent.objects.create(
-        aggregate_type = "Order",
-        aggregate_id = order.id,
-        event_type = "OrderCancelled",
-        schema_version = 1,
-        payload = {
-            "order_id": str(order.id),
-            "reason": reason,
-        }
-    )
+        order.status = "CANCELLED"
+        order.save(update_fields=["status"])
+
+        OutboxEvent.objects.create(
+            aggregate_type = "Order",
+            aggregate_id = order.id,
+            event_type = "OrderCancelled",
+            schema_version = 1,
+            payload = {
+                "order_id": str(order.id),
+                "reason": reason,
+            },
+        )
+    # Simulate crash after commit
+    raise RuntimeError("Simulated failure after cancellation")
