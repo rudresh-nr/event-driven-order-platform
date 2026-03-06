@@ -52,8 +52,9 @@ def handle_order_created(event):
 def handle_order_cancelled(event):
     payload = event["payload"]
 
-    OrdersByUser.objects.filter(
-        order_id = payload["order_id"]
-    ).update(
-        status = "CANCELLED"
+    OrdersByUser.objects.update_or_create(
+        order_id = payload["order_id"],
+        defaults={
+            "status": "CANCELLED"
+        }
     )

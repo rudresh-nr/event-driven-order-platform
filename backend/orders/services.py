@@ -4,11 +4,12 @@ from orders.models import Order
 from outbox.models import OutboxEvent
 
 @transaction.atomic
-def create_order(user_id, total_amount):
+def create_order(user_id, total_amount, currency="INR"):
     order = Order.objects.create(
         user_id=user_id,
         status=Order.STATUS_CREATED,
         total_amount=total_amount,
+        currency=currency,
     )
 
     #raise Exception("Simulated failure after order creation")
@@ -51,4 +52,4 @@ def cancel_order(order_id: str, reason: str="User requested cancellation"):
             },
         )
     # Simulate crash after commit
-    raise RuntimeError("Simulated failure after cancellation")
+    #raise RuntimeError("Simulated failure after cancellation")

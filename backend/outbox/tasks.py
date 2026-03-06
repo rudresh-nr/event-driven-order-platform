@@ -41,16 +41,22 @@ def consume_published_events(self, batch_size=100):
     - Replay-safe
     - Side-effect free for write models
     """
-    events = (
-        OutboxEvent.objects
-        .filter(published=True)
-        .order_by("created_at")[:batch_size]
-    )
+    with transaction.atomic():
+        events = (
+            OutboxEvent.objects
+            .select_for_update(skip_locked=True)
+            .filter(published=True, consumed=False)
+            .order_by("created_at")[:batch_size]
+        )
 
-    for event in events:
-        dispatch_event({
-            "event_type": event.event_type,
-            "payload": event.payload,
-            "schema_version": event.schema_version,
-            "created_at": event.created_at,
-        })
+        for event in events:
+            dispatch_event({
+                "event_type": event.event_type,
+                "payload": event.payload,
+                "schema_version": event.schema_version,
+                "created_at": event.created_at,
+            })
+
+            # Mark as consumed only after successful dispatch
+            event.consumed = True
+        event.save(update_fields=["consumed"])

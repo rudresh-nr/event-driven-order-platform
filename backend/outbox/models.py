@@ -12,6 +12,7 @@ class OutboxEvent(models.Model):
     schema_version = models.IntegerField()
 
     published = models.BooleanField(default=False)
+    consumed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
