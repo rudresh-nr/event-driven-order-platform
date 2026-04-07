@@ -50,6 +50,7 @@ def handle_order_created(event):
     )
 
 def handle_order_cancelled(event):
+    raise RuntimeError("Simulated consumer failure")
     payload = event["payload"]
 
     OrdersByUser.objects.update_or_create(

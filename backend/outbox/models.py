@@ -15,9 +15,12 @@ class OutboxEvent(models.Model):
     consumed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    retry_count = models.IntegerField(default=0)
+    failed = models.BooleanField(default=False)
+
     class Meta:
         indexes = [
-           models.Index(fields=["published", "created_at"]),
+           models.Index(fields=["published", "consumed", "failed", "created_at"]),
            models.Index(fields=["aggregate_id"]),
         ]
     

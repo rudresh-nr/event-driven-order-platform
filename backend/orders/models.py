@@ -35,6 +35,10 @@ class Order(models.Model):
             )
         ]
 
+        indexes = [
+            models.Index(fields=["user_id", "status", "created_at"]),
+        ]
+
 
     ALLOWED_TRANSITIONS = {
         "CREATED": {"CANCELLED"},

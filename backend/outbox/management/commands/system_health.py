@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
+from outbox.services.health_metrics import get_outbox_distribution
 
 def classify(value, warn, critical):
     if value is None:
@@ -74,3 +75,15 @@ class Command(BaseCommand):
         self.stdout.write(f"Publish Lag: {publish_lag} [{publish_lag_status}]")
         
         self.stdout.write(f"Read Model Lag: {read_model_lag_seconds} [{read_model_status}]")
+
+
+        #------------ EVENT DISTRIBUTION------
+        stats = get_outbox_distribution()
+        self.stdout.write("\nEVENT DISTRIBUTION")
+        self.stdout.write(f"Total: {stats['total_events']}")
+        self.stdout.write(f"Published: {stats['published_events']}")
+        self.stdout.write(f"Not Published:{stats['not_published_events']}")
+        self.stdout.write(f"Consumed: {stats['consumed_events']}")
+        self.stdout.write(f"Not Consumed: {stats['not_consumed_events']}")
+
+        self.stdout.write(f"Ready to consume: {stats['ready_to_consume_events']}")
