@@ -1,10 +1,10 @@
 from celery import shared_task
 from django.db import transaction
 from django.db.models import F
-
+from outbox.dispatcher import dispatch_event
 from outbox.models import OutboxEvent
 from outbox.publisher import publish_event
-from readmodels.dispatcher import dispatch_event
+
 
 # autoretry_for=(Exception,), retry_backoff=5) should be used cautiously in production
 @shared_task

@@ -1,7 +1,7 @@
 from asyncio.log import logger
 from .models import OrdersByUser
 
-def handle_order_created(event):
+def readmodel_handle_order_created(event):
 
     logger.info(
         "Processing event", extra={
