@@ -12,7 +12,7 @@ def saga_handle_order_created(event):
             aggregate_id = order_id,
             event_type = "PaymentSucceeded",
             payload = {"order_id": order_id},
-            Schema_version = 1,
+            schema_version = 1,
         )
     else:
         OutboxEvent.objects.create(
@@ -30,4 +30,10 @@ def saga_handle_payment_succeeded(event):
 
 def saga_handle_payment_failed(event):
     order_id = event["payload"]["order_id"]
-    Order.objects.filter(id=order_id).update(status=Order.STATUS_CANCELLED)
+
+    print("PAYMENT FAILED SAGA")
+    print("ORDER ID:", order_id)
+    updated = Order.objects.filter(id=order_id).update(status=Order.STATUS_CANCELLED)
+    print("ROWS UPDATED:", updated)
+
+    #Order.objects.filter(id=order_id).update(status=Order.STATUS_CANCELLED)

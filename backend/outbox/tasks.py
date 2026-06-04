@@ -23,9 +23,13 @@ def publish_outbox_events(batch_size=100):
         .order_by("created_at")[:batch_size]
     )
 
+    print("PUBLISH TASK FOUND EVENTS:", events.count())
+
     for event in events:
         try:
+            print("BEFORE publish_event")
             publish_event(event) # send to message broker
+            print("AFTER publish_event")
             
             # Line 31 is using the ORM's update method to mark the event as published without 
             # loading it into memory, which is more efficient than the approach in the commented-out 
@@ -67,7 +71,9 @@ def _consume_published_events(batch_size=100):
     MAX_RETRIES = 3
     for event in events:
         try:
+            print("CALLING DISPATCH FOR:", event.event_type, event.id)
             dispatch_event({
+                "id": str(event.id),
                 "event_type": event.event_type,
                 "payload": event.payload,
                 "schema_version": event.schema_version,
@@ -76,6 +82,11 @@ def _consume_published_events(batch_size=100):
             OutboxEvent.objects.filter(id=event.id).update(consumed=True)
 
         except Exception as e:
+
+            print("CONSUMER ERROR:", repr(e))
+            print("FAILED EVENT TYPE:", event.event_type)
+            print("FAILED EVENT ID:", event.id)
+
             # retry increment persistently to avoid infinite retries on poison events
             OutboxEvent.objects.filter(id=event.id).update(retry_count=F('retry_count') + 1)
             event.refresh_from_db() # Refresh to get updated retry_count

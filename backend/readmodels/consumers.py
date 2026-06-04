@@ -49,7 +49,7 @@ def readmodel_handle_order_created(event):
         }
     )
 
-def handle_order_cancelled(event):
+def readmodel_handle_order_cancelled(event):
     raise RuntimeError("Simulated consumer failure")
     payload = event["payload"]
 
@@ -59,3 +59,13 @@ def handle_order_cancelled(event):
             "status": "CANCELLED"
         }
     )
+
+def readmodel_handle_payment_succeeded(event):
+    order_id = event["payload"]["order_id"]
+
+    OrdersByUser.objects.filter(order_id=order_id).update(status="CONFIRMED")
+
+def readmodel_handle_payment_failed(event):
+    order_id = event["payload"]["order_id"]
+
+    OrdersByUser.objects.filter(order_id=order_id).update(status="CANCELLED")

@@ -20,10 +20,18 @@ class OutboxEvent(models.Model):
 
     class Meta:
         indexes = [
-           models.Index(fields=["published", "consumed", "failed", "created_at"]),
-           models.Index(fields=["aggregate_id"]),
+            models.Index(fields=["published", "consumed", "failed", "created_at"]),
+            models.Index(fields=["aggregate_id"]),
         ]
-    
+
+class ProcessedEvent(models.Model):
+    event_id = models.UUIDField(unique=True)
+    processed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["event_id"]),
+        ]
 
         
 

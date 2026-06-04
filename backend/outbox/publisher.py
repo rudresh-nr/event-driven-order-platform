@@ -7,8 +7,17 @@ def publish_event(event):
     """
 
     # Placeholder for Kafka / message broker
-    
+
+    event_dict = {
+        "id": str(event.id),
+        "event_type": event.event_type,
+        "payload": event.payload,
+        "created_at": str(event.created_at),
+    }
+
     print(
-        f"[PUBLISH] {event.event_type} | "
-        f"aggregate={event.aggregate_type}:{event.aggregate_id}"
+        "PUBLISHING EVENT_ID:", event_dict["id"]
     )
+
+    # instead of just printing, send the structured event forward to the message broker here
+    print("PUBLISHING EVENT_ID:", event.id)
