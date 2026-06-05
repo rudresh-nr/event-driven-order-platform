@@ -30,10 +30,4 @@ def saga_handle_payment_succeeded(event):
 
 def saga_handle_payment_failed(event):
     order_id = event["payload"]["order_id"]
-
-    print("PAYMENT FAILED SAGA")
-    print("ORDER ID:", order_id)
-    updated = Order.objects.filter(id=order_id).update(status=Order.STATUS_CANCELLED)
-    print("ROWS UPDATED:", updated)
-
-    #Order.objects.filter(id=order_id).update(status=Order.STATUS_CANCELLED)
+    Order.objects.filter(id=order_id).update(status=Order.STATUS_CANCELLED)

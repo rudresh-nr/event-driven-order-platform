@@ -6,8 +6,6 @@ from outbox.models import ProcessedEvent
 
 def dispatch_event(event):
 
-    print("DISPATCH EVENT CALLED")
-
     event_id = event["id"]
     if ProcessedEvent.objects.filter(event_id=event_id).exists():
         print(f"Skipping duplicate event {event_id}")
@@ -16,7 +14,6 @@ def dispatch_event(event):
 
     try:
         event_type = event["event_type"]
-        print("EVENT TYPE:", event_type)
         #🔥  saga orchestration
         if event_type == "OrderCreated":
             saga_handle_order_created(event)
@@ -30,10 +27,8 @@ def dispatch_event(event):
             saga_handle_payment_failed(event)
             readmodel_handle_payment_failed(event)
 
-        print("ABOUT TO SAVE:", event_id)
         # Mark event as processed to ensure idempotency
         ProcessedEvent.objects.get_or_create(event_id=event_id)
-        print("SAVED PROCESSED EVENT:", event_id)
 
     except Exception as e:
         print(f"Error processing event {event_id}: {e}")

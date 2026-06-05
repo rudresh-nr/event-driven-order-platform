@@ -23,13 +23,10 @@ def publish_outbox_events(batch_size=100):
         .order_by("created_at")[:batch_size]
     )
 
-    print("PUBLISH TASK FOUND EVENTS:", events.count())
 
     for event in events:
         try:
-            print("BEFORE publish_event")
             publish_event(event) # send to message broker
-            print("AFTER publish_event")
             
             # Line 31 is using the ORM's update method to mark the event as published without 
             # loading it into memory, which is more efficient than the approach in the commented-out 
@@ -71,7 +68,6 @@ def _consume_published_events(batch_size=100):
     MAX_RETRIES = 3
     for event in events:
         try:
-            print("CALLING DISPATCH FOR:", event.event_type, event.id)
             dispatch_event({
                 "id": str(event.id),
                 "event_type": event.event_type,
