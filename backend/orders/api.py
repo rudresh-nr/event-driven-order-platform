@@ -8,7 +8,7 @@ from outbox.models import OutboxEvent
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-
+# Need to remove this in production
 @method_decorator(csrf_exempt, name="dispatch")
 class OrderCreateView(View):
 
