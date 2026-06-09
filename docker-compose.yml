@@ -1,0 +1,50 @@
+services:
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: order_platform
+      POSTGRES_USER: order_user
+      POSTGRES_PASSWORD: Sony123456789
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6380:6379"
+
+  web:
+    build:
+      context: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+
+  celery-worker:
+    build:
+      context: ./backend
+    command: celery -A config worker -l info
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - redis
+
+  celery-beat:
+    build:
+      context: ./backend
+    command: celery -A config beat -l info
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - redis

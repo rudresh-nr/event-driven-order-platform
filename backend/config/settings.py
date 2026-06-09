@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
-import django_celery_results
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -98,7 +96,7 @@ DATABASES = {
         'NAME': 'order_platform',
         'USER': 'order_user',
         'PASSWORD': 'Sony123456789',
-        'HOST': 'localhost',
+        'HOST': 'postgres',  # Use 'localhost' if running without Docker
         'PORT': '5432',
     }
 }
@@ -164,8 +162,8 @@ LOGGING = {
 # =======================================
 # Celery / Redis Settings
 # =======================================
-
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+# Use 'redis://localhost:6379/0' if running without Docker
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0') 
 broker_connection_retry_on_startup = True
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
