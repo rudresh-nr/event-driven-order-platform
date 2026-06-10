@@ -36,3 +36,8 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t event-driven-order-platform ./backend
+      
+      - name: Run Django Tests
+        run: |
+          cd backend 
+          python manage.py test
