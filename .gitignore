@@ -21,4 +21,4 @@ db.sqlite3
 # Node (frontend)
 node_modules/
 dist/
-build/
+build/backend/celerybeat-schedule
