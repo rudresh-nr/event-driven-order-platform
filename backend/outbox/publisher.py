@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 def publish_event(event):
     """
     Boundary function responsible for publishing an event
@@ -15,9 +19,10 @@ def publish_event(event):
         "created_at": str(event.created_at),
     }
 
-    print(
-        "PUBLISHING EVENT_ID:", event_dict["id"]
+    logger.info(
+        "publishing_outbox_event",
+        extra={
+            "event_id": event_dict["id"],
+            "event_type": event.event_type,
+        },
     )
-
-    # instead of just printing, send the structured event forward to the message broker here
-    print("PUBLISHING EVENT_ID:", event.id)

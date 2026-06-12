@@ -1,5 +1,8 @@
-from asyncio.log import logger
+import logging
 from .models import OrdersByUser
+
+
+logger = logging.getLogger(__name__)
 
 def readmodel_handle_order_created(event):
 
@@ -15,10 +18,13 @@ def readmodel_handle_order_created(event):
     version = event.get("schema_version", 1)
     payload = event["payload"]
  
-    print(
-    "CONSUMING:",
-    "version=", version,
-    "currency=", payload.get("currency")
+    logger.info(
+        "consuming_order_created_event",
+        extra={
+            "version": version,
+            "currency": payload.get("currency"),
+            "order_id": payload.get("order_id"),
+        },
     )
 
 
