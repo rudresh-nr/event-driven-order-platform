@@ -4,6 +4,9 @@ from django.db.models import F
 from outbox.dispatcher import dispatch_event
 from outbox.models import OutboxEvent
 from outbox.publisher import publish_event
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # autoretry_for=(Exception,), retry_backoff=5) should be used cautiously in production
@@ -43,9 +46,13 @@ def publish_outbox_events(batch_size=100):
 
 
         except Exception as e:
-            # Log the error and let Celery handle the retry
-            print(f"Error publishing event {event.id}: {e}")
-            # raise self.retry(exc=e) # Uncomment if you want to use Celery's retry mechanism
+            logger.exception(
+                "Publish_outbox_event_failed",
+                extra={
+                    "event_id": str(event.id),
+                    "event_type": event.event_type,
+                },
+            )
 
 
 def _consume_published_events(batch_size=100):
@@ -79,9 +86,14 @@ def _consume_published_events(batch_size=100):
 
         except Exception as e:
 
-            print("CONSUMER ERROR:", repr(e))
-            print("FAILED EVENT TYPE:", event.event_type)
-            print("FAILED EVENT ID:", event.id)
+            logger.exception(
+                "consume_published_events_failed",
+                extra={
+                    "event_id": str(event.id),
+                    "event_type": event.event_type,
+                    "retry_count": event.retry_count,
+                },
+            )
 
             # retry increment persistently to avoid infinite retries on poison events
             OutboxEvent.objects.filter(id=event.id).update(retry_count=F('retry_count') + 1)
