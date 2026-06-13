@@ -1,11 +1,11 @@
 import json
-
 from django.http import JsonResponse
 from django.views import View
 from orders.models import Order
 from outbox.models import OutboxEvent
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from orders.metrics import orders_created_total
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,8 @@ class OrderCreateView(View):
             total_amount = data["total_amount"],
             currency = data.get("currency", "INR"),
         )
+
+        orders_created_total.inc()
 
         logger.info(
             "Order Created",
