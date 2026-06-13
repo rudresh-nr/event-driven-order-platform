@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path
 from readmodels.api import OrdersByUserView
 from orders.api import OrderCreateView
+from orders.metrics_views import metrics
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('orders/', OrderCreateView.as_view()),
     path('users/<uuid:user_id>/orders/', OrdersByUserView.as_view()),
+    path('metrics/', metrics)
 ]
