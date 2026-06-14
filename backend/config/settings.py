@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-kbo9qmw+!*p*tc(8*9zxwe9tn^xuug(ciebyr#b2ee96jbjs5y
 DEBUG = True
 #os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 CACHES = {
     "default": {
