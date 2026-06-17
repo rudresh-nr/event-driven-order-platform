@@ -1,6 +1,6 @@
 import logging
 from .models import OrdersByUser
-
+from outbox.metrics import events_consumed_total
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,15 @@ def readmodel_handle_order_created(event):
             "currency": currency,
             "created_at": event["created_at"],
         }
+    )
+
+    events_consumed_total.inc()
+
+    logger.info(
+    "consume_metric_incremented",
+    extra={
+        "event_id": str(event["id"])
+    }
     )
 
 def readmodel_handle_order_cancelled(event):
