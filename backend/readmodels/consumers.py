@@ -7,7 +7,8 @@ logger = logging.getLogger(__name__)
 def readmodel_handle_order_created(event):
 
     logger.info(
-        "Processing event", extra={
+        "Processing event", 
+        extra={
             "order_id" : event["payload"].get("order_id"),
             "schema_version" : event["schema_version"],
             "created_at" : event["created_at"], # optional but useful
@@ -19,13 +20,15 @@ def readmodel_handle_order_created(event):
     payload = event["payload"]
  
     logger.info(
-        "consuming_order_created_event",
-        extra={
-            "version": version,
-            "currency": payload.get("currency"),
-            "order_id": payload.get("order_id"),
-        },
-    )
+    "consuming_order_created_event",
+    extra={
+        "event_id": str(event["id"]),
+        "version": version,
+        "currency": payload.get("currency"),
+        "order_id": payload.get("order_id"),
+        "user_id": payload.get("user_id"),
+    },
+)
 
 
     if version == 1:
@@ -38,7 +41,7 @@ def readmodel_handle_order_created(event):
         order_id = payload["order_id"]
         user_id = payload["user_id"]
         total_amount = payload["total_amount"]
-        currency = payload.get("currency", "Unknown") # ?? doubt
+        currency = payload.get("currency") 
     
     else:
         # Future-proofing
