@@ -1,0 +1,15 @@
+groups:
+  - name: infrastructure_alerts
+
+    rules:
+      - alert: ApplicationDown
+        expr: up == 0
+        for: 1m
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance)(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 5m
