@@ -5,6 +5,8 @@ from outbox.models import OutboxEvent
 
 @transaction.atomic
 def create_order(user_id, total_amount, currency="INR"):
+
+    correlation_id = str(uuid.uuid4())
     order = Order.objects.create(
         user_id=user_id,
         status=Order.STATUS_CREATED,
@@ -25,6 +27,7 @@ def create_order(user_id, total_amount, currency="INR"):
             "total_amount": str(total_amount),
             "currency": "INR",
             "source": "web",
+            "correlation_id": correlation_id,
         },
     )
 

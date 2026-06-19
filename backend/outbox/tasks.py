@@ -2,7 +2,7 @@ from celery import shared_task
 from django.db import transaction
 from django.db.models import F
 from outbox.dispatcher import dispatch_event
-from outbox.models import OutboxEvent
+from outbox.models import (DeadLetterEvent, OutboxEvent)
 from outbox.publisher import publish_event
 import logging
 
@@ -100,7 +100,20 @@ def _consume_published_events(batch_size=100):
             event.refresh_from_db() # Refresh to get updated retry_count
 
             if event.retry_count >= MAX_RETRIES:
-                OutboxEvent.objects.filter(id=event.id).update(failed=True)
+
+                DeadLetterEvent.objects.get_or_create(
+                    event_id=event.id,
+                    defaults={
+                        "event_type": event.event_type,
+                        "payload": event.payload,
+                        "error_message": str(e),
+                        "retry_count": event.retry_count,
+                    },
+                )
+
+                OutboxEvent.objects.filter(
+                    id=event.id
+                ).update(failed=True)
 
             '''
              after marking the event as failed will cause Celery to retry even for failed events.

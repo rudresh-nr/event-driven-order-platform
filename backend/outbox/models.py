@@ -34,4 +34,13 @@ class ProcessedEvent(models.Model):
         ]
 
         
-
+class DeadLetterEvent(models.Model):
+    event_id = models.UUIDField(unique=True)
+    event_type = models.CharField(max_length=100)
+    payload = models.JSONField()
+    error_message = models.TextField()
+    retry_count = models.IntegerField(default=0)
+    failed_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.event_type} - {self.event_id}"

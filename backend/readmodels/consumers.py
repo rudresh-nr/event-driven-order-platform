@@ -5,13 +5,13 @@ from outbox.metrics import events_consumed_total
 logger = logging.getLogger(__name__)
 
 def readmodel_handle_order_created(event):
-
     logger.info(
         "Processing event", 
         extra={
             "order_id" : event["payload"].get("order_id"),
             "schema_version" : event["schema_version"],
             "created_at" : event["created_at"], # optional but useful
+            "correlation_id": payload.get("correlation_id"),
         }
     )
 
@@ -27,6 +27,7 @@ def readmodel_handle_order_created(event):
         "currency": payload.get("currency"),
         "order_id": payload.get("order_id"),
         "user_id": payload.get("user_id"),
+        "correlation_id": payload.get("correlation_id"),
     },
 )
 
@@ -68,8 +69,15 @@ def readmodel_handle_order_created(event):
     )
 
 def readmodel_handle_order_cancelled(event):
-    raise RuntimeError("Simulated consumer failure")
     payload = event["payload"]
+
+    logger.info(
+        "payment_succeeded_event",
+        extra={
+            "order_id": payload.get("order_id"),
+            "correlation_id": payload.get("correlation_id"),
+        },
+    )
 
     OrdersByUser.objects.update_or_create(
         order_id = payload["order_id"],
@@ -77,9 +85,19 @@ def readmodel_handle_order_cancelled(event):
             "status": "CANCELLED"
         }
     )
+    
 
 def readmodel_handle_payment_succeeded(event):
     order_id = event["payload"]["order_id"]
+    payload = event["payload"]
+
+    logger.info(
+        "payment_failed_event",
+        extra={
+            "order_id": payload.get("order_id"),
+            "correlation_id": payload.get("correlation_id"),
+        },
+    )
 
     OrdersByUser.objects.filter(order_id=order_id).update(status="CONFIRMED")
 
