@@ -1,7 +1,7 @@
 import traceback
 
-from readmodels.consumers import readmodel_handle_order_created, readmodel_handle_payment_succeeded, readmodel_handle_payment_failed
-from outbox.services.saga import (saga_handle_order_created, saga_handle_payment_succeeded, saga_handle_payment_failed)
+from readmodels.consumers import (readmodel_handle_order_created, readmodel_handle_payment_succeeded, readmodel_handle_payment_failed, readmodel_handle_order_cancelled)
+from outbox.services.saga import (saga_handle_order_created, saga_handle_payment_succeeded, saga_handle_payment_failed, saga_handle_order_cancelled)
 from outbox.models import ProcessedEvent
 
 def dispatch_event(event):
@@ -26,6 +26,9 @@ def dispatch_event(event):
         elif event_type == "PaymentFailed":
             saga_handle_payment_failed(event)
             readmodel_handle_payment_failed(event)
+        elif event_type == "OrderCancelled":
+            saga_handle_order_cancelled(event)
+            readmodel_handle_order_cancelled(event)
 
         # Mark event as processed to ensure idempotency
         ProcessedEvent.objects.get_or_create(event_id=event_id)

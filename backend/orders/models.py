@@ -41,7 +41,8 @@ class Order(models.Model):
 
 
     ALLOWED_TRANSITIONS = {
-        "CREATED": {"CANCELLED"},
+        "CREATED": {"CONFIRMED","CANCELLED"},
+        "CONFIRMED": {"CANCELLED"},
         "CANCELLED": set(),
 
     }

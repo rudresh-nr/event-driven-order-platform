@@ -74,6 +74,7 @@ def _consume_published_events(batch_size=100):
     )
     MAX_RETRIES = 3
     for event in events:
+        print("CONSUMER PROCESSING:",event.id,event.event_type,event.consumed)
         try:
             dispatch_event({
                 "id": str(event.id),

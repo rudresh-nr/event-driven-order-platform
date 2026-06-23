@@ -32,3 +32,6 @@ def saga_handle_payment_succeeded(event):
 def saga_handle_payment_failed(event):
     order_id = event["payload"]["order_id"]
     Order.objects.filter(id=order_id).update(status=Order.STATUS_CANCELLED)
+
+def saga_handle_order_cancelled(event):
+    pass

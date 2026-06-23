@@ -4,7 +4,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from orders.metrics import orders_created_total
-from orders.services import create_order
+from orders.services import (create_order, cancel_order)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -40,4 +40,16 @@ class OrderCreateView(View):
                 "status": order.status,
             },
             status=201,
+        )
+
+@method_decorator(csrf_exempt, name="dispatch")
+class OrderCancelView(View):
+
+    def post(self, request, order_id):
+        order = cancel_order(order_id)
+        return JsonResponse(
+            {
+                "order_id": str(order.id),
+                "status": order.status,
+            }
         )

@@ -1,10 +1,16 @@
 import logging
+import traceback
 from .models import OrdersByUser
 from outbox.metrics import events_consumed_total
 
 logger = logging.getLogger(__name__)
 
 def readmodel_handle_order_created(event):
+
+    print("====== ORDER CREATED HANDLER START ======")
+    print(event)
+
+    payload = event["payload"]
     logger.info(
         "Processing event", 
         extra={
@@ -17,7 +23,7 @@ def readmodel_handle_order_created(event):
 
 
     version = event.get("schema_version", 1)
-    payload = event["payload"]
+
  
     logger.info(
     "consuming_order_created_event",
@@ -47,19 +53,29 @@ def readmodel_handle_order_created(event):
     else:
         # Future-proofing
         raise ValueError(f"Unsupported OrderCreated version: {version}")
+    
+    print("order_id =", order_id)
+    print("user_id =", user_id)
+    print("total_amount =", total_amount)
+    print("currency =", currency)
 
-    OrdersByUser.objects.update_or_create(
-        order_id= order_id,
-        defaults={
-            "user_id": user_id,
-            "status": "CREATED",
-            "total_amount": total_amount,
-            "currency": currency,
-            "created_at": event["created_at"],
-        }
-    )
+    try:
+        OrdersByUser.objects.update_or_create(
+            order_id= order_id,
+            defaults={
+                "user_id": user_id,
+                "status": "CREATED",
+                "total_amount": total_amount,
+                "currency": currency,
+                "created_at": event["created_at"],
+            }
+        )
 
-    events_consumed_total.inc()
+        events_consumed_total.inc()
+    except Exception as e:
+        print("READMODEL ERROR: ", e)
+        traceback.print_exc()
+        raise
 
     logger.info(
     "consume_metric_incremented",
@@ -69,7 +85,9 @@ def readmodel_handle_order_created(event):
     )
 
 def readmodel_handle_order_cancelled(event):
+    print("===== ORDER CANCELLED HANDLER =====")
     payload = event["payload"]
+    print("PAYLOAD =", payload)
 
     logger.info(
         "payment_succeeded_event",
@@ -79,12 +97,16 @@ def readmodel_handle_order_cancelled(event):
         },
     )
 
-    OrdersByUser.objects.update_or_create(
+    obj, created = OrdersByUser.objects.update_or_create(
         order_id = payload["order_id"],
         defaults={
             "status": "CANCELLED"
         }
     )
+
+    print("ROW ID =", obj.id)
+    print("CREATED =", created)
+    print("STATUS =", obj.status)
     
 
 def readmodel_handle_payment_succeeded(event):
