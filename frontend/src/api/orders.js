@@ -16,3 +16,10 @@ export const getOrderByUser = async (userID) => {
 
   return response.data;
 }
+
+export async function cancelOrder(orderId) {
+    const response = await axios.post(
+        `http://localhost:8000/orders/${orderId}/cancel/`
+    );
+    return response.data;
+}

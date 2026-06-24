@@ -1,5 +1,5 @@
 
-import { getOrderByUser } from "../api/orders";
+import { getOrderByUser, cancelOrder } from "../api/orders";
 import OrderTable from "./OrderTable";
 import { useState, useEffect } from "react";
 
@@ -21,6 +21,17 @@ function OrderList() {
         }
     }
     useEffect(() => {loadOrders();}, []);
+
+    const handleCancel = async (orderId) => {
+        try{
+            await cancelOrder(orderId);
+            //load orders after cancellation
+            loadOrders();
+        }catch(error) {
+            console.error(error)
+            alert("failed to cancel order");
+        }
+    }
 
 return (
     <div className="card">
@@ -46,7 +57,7 @@ return (
         )}
 
         {orders.length > 0 && (
-            <OrderTable orders={orders}/>
+            <OrderTable orders={orders} onCancel={handleCancel}/>
         )}
     </div>
 );

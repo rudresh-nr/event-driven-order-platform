@@ -54,5 +54,6 @@ def cancel_order(order_id: str, reason: str="User requested cancellation"):
                 "reason": reason,
             },
         )
+    return order
     # Simulate crash after commit
     #raise RuntimeError("Simulated failure after cancellation")

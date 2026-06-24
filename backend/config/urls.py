@@ -19,12 +19,14 @@ from django.urls import path
 from readmodels.api import OrdersByUserView
 from orders.api import (OrderCreateView, OrderCancelView)
 from orders.metrics_views import metrics
+from orders.dashboard_api import dashboard_metrics
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('orders/', OrderCreateView.as_view()),
     path('orders/<uuid:order_id>/cancel/', OrderCancelView.as_view()),
     path('users/<uuid:user_id>/orders/', OrdersByUserView.as_view()),
-    path('metrics/', metrics)
+    path('metrics/', metrics),
+    path('dashboard-metrics/', dashboard_metrics),
 
 ]
