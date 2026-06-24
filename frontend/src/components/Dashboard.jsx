@@ -16,6 +16,13 @@ function Dashboard() {
         }
 
         loadMetrics();
+
+        const interval = setInterval(
+        loadMetrics,
+        5000
+        );
+
+    return () => clearInterval(interval);
     },[]);
 
     if (!metrics) {

@@ -20,7 +20,11 @@ function OrderList() {
             setLoading(false);
         }
     }
-    useEffect(() => {loadOrders();}, []);
+    useEffect(() => {loadOrders();
+         const interval = setInterval(loadOrders,5000);
+        return () => clearInterval(interval);
+
+    }, []);
 
     const handleCancel = async (orderId) => {
         try{
